@@ -2,6 +2,7 @@ import UIKit
 
 protocol ChannelsViewDelegate: AnyObject {
     func reloadView(_ favorites: [Channel], fromFavorites: Bool)
+    func pushVideoPlayer(_ url: URL)
 }
 
 final class ChannelsView: UIView {
@@ -65,7 +66,11 @@ final class ChannelsView: UIView {
         contains ? storageService.delete(id) : storageService.add(id)
         favoriteChanels = channels.filter({ storageService.favoritesId.contains($0.id) })
         delegate?.reloadView(favoriteChanels, fromFavorites: isFavorite)
-        if isFavorite { collectionView.reloadData() }
+        if isFavorite {
+            guard let cell = sender.cell, let indexPath = collectionView.indexPath(for: cell) else { return }
+            collectionView.deleteItems(at: [indexPath])
+            collectionView.reloadData()
+        }
     }
     
     private func setupViews() {
@@ -92,6 +97,14 @@ final class ChannelsView: UIView {
 }
 
 extension ChannelsView: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+//        let urlString = isFavorite ? favoriteChanels[indexPath.row].url : channels[indexPath.row].url
+        let urlString = "http://qthttp.apple.com.edgesuite.net/1010qwoeiuryfg/sl.m3u8"
+        guard let url = URL(string: urlString) else { return }
+        delegate?.pushVideoPlayer(url)
+    }
+    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return isFavorite ? favoriteChanels.count : channels.count
     }
@@ -102,8 +115,8 @@ extension ChannelsView: UICollectionViewDelegate, UICollectionViewDataSource, UI
         guard let id = cell.id else { return cell }
         cell.starButton.isSelected = storageService.favoritesId.contains(id)
         cell.starButton.tag = id
-        cell.starButton.indexPath = indexPath
         cell.starButton.addTarget(self, action: #selector(addToFavorites(sender:)), for: .touchUpInside)
+        if isFavorite { cell.starButton.cell = cell }
         return cell
     }
     

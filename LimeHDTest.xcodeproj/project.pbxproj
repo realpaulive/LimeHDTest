@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		717EF4792A4C5299004F6A97 /* AppUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 717EF4782A4C5298004F6A97 /* AppUtility.swift */; };
 		71C0517D2A485F1700270065 /* MenuBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71C0517C2A485F1700270065 /* MenuBar.swift */; };
 		71C051812A48AD1400270065 /* MenuCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71C051802A48AD1400270065 /* MenuCell.swift */; };
 		71E747992A4AFD78003F64A1 /* LimeResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71E747982A4AFD78003F64A1 /* LimeResponse.swift */; };
@@ -15,6 +16,7 @@
 		71E747A32A4B168F003F64A1 /* ChannelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71E747A22A4B168F003F64A1 /* ChannelsView.swift */; };
 		71E747A52A4B4008003F64A1 /* StorageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71E747A42A4B4008003F64A1 /* StorageService.swift */; };
 		71E747A82A4B6934003F64A1 /* UIButtonExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71E747A72A4B6934003F64A1 /* UIButtonExtension.swift */; };
+		71E747AE2A4C4603003F64A1 /* PlayerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71E747AD2A4C4603003F64A1 /* PlayerViewController.swift */; };
 		71E775742A45A6AC0025268C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71E775732A45A6AC0025268C /* AppDelegate.swift */; };
 		71E775762A45A6AC0025268C /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71E775752A45A6AC0025268C /* SceneDelegate.swift */; };
 		71E775782A45A6AC0025268C /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71E775772A45A6AC0025268C /* MainViewController.swift */; };
@@ -23,6 +25,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		717EF4782A4C5298004F6A97 /* AppUtility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUtility.swift; sourceTree = "<group>"; };
 		71C0517C2A485F1700270065 /* MenuBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBar.swift; sourceTree = "<group>"; };
 		71C051802A48AD1400270065 /* MenuCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuCell.swift; sourceTree = "<group>"; };
 		71E747982A4AFD78003F64A1 /* LimeResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LimeResponse.swift; sourceTree = "<group>"; };
@@ -31,6 +34,7 @@
 		71E747A22A4B168F003F64A1 /* ChannelsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelsView.swift; sourceTree = "<group>"; };
 		71E747A42A4B4008003F64A1 /* StorageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageService.swift; sourceTree = "<group>"; };
 		71E747A72A4B6934003F64A1 /* UIButtonExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIButtonExtension.swift; sourceTree = "<group>"; };
+		71E747AD2A4C4603003F64A1 /* PlayerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerViewController.swift; sourceTree = "<group>"; };
 		71E775702A45A6AC0025268C /* LimeHDTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LimeHDTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		71E775732A45A6AC0025268C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		71E775752A45A6AC0025268C /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -51,6 +55,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		717EF4772A4C5278004F6A97 /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				717EF4782A4C5298004F6A97 /* AppUtility.swift */,
+			);
+			path = Helpers;
+			sourceTree = "<group>";
+		};
 		71E747972A4AFD3C003F64A1 /* Model */ = {
 			isa = PBXGroup;
 			children = (
@@ -83,6 +95,7 @@
 			isa = PBXGroup;
 			children = (
 				71E775772A45A6AC0025268C /* MainViewController.swift */,
+				71E747AD2A4C4603003F64A1 /* PlayerViewController.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -127,6 +140,7 @@
 				71E7479A2A4B0044003F64A1 /* Vews */,
 				71E7479E2A4B0996003F64A1 /* Controller */,
 				71E7479D2A4B0983003F64A1 /* ServiceLayer */,
+				717EF4772A4C5278004F6A97 /* Helpers */,
 				71E775872A45AF870025268C /* Resources */,
 				71E775812A45A6B00025268C /* Info.plist */,
 			);
@@ -220,8 +234,10 @@
 				71E747A12A4B09BE003F64A1 /* NetworkService.swift in Sources */,
 				71C051812A48AD1400270065 /* MenuCell.swift in Sources */,
 				71E775742A45A6AC0025268C /* AppDelegate.swift in Sources */,
+				71E747AE2A4C4603003F64A1 /* PlayerViewController.swift in Sources */,
 				71E747A52A4B4008003F64A1 /* StorageService.swift in Sources */,
 				71E747992A4AFD78003F64A1 /* LimeResponse.swift in Sources */,
+				717EF4792A4C5299004F6A97 /* AppUtility.swift in Sources */,
 				71E747A32A4B168F003F64A1 /* ChannelsView.swift in Sources */,
 				71C0517D2A485F1700270065 /* MenuBar.swift in Sources */,
 				71E775762A45A6AC0025268C /* SceneDelegate.swift in Sources */,

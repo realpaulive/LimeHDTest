@@ -56,15 +56,12 @@ final class MainViewController: UIViewController {
         view.backgroundColor = .black
         navigationItem.titleView = seachBar
         fetchChannels()
-        
-        
-        //ask the system to start notifying when interface change
-        
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         setNavigationAppearence()
+        AppUtility.lockOrientation(.portrait)
     }
     
     private func setupViews() {
@@ -152,6 +149,11 @@ extension MainViewController: MenuBarDelegate {
 }
 
 extension MainViewController: ChannelsViewDelegate {
+    func pushVideoPlayer(_ url: URL) {
+        let vc = PlayerViewController(url: url)
+        self.present(vc, animated: true)
+    }
+    
     func reloadView(_ favorites: [Channel], fromFavorites: Bool) {
         switch fromFavorites {
         case true:
