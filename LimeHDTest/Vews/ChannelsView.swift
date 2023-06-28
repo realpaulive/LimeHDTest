@@ -1,27 +1,22 @@
 import UIKit
 
-final class ChannelsView: UICollectionViewCell {
-    
-    static var cellId = "ChannelsView"
-    
-    private let storageService = StorageService.shared
-    
-    var isFavorite: Bool = false {
-        didSet {
-            if isFavorite {
-                collectionView.isHidden = StorageService.shared.favoritesId.isEmpty
-                emptyLabel.isHidden = !StorageService.shared.favoritesId.isEmpty
-            }
-        }
-    }
-    
-    private var channels: [Channel] {
-        didSet {
-            collectionView.reloadData()
-        }
-    }
-    private lazy var favoriteChanels = channels.filter { storageService.favoritesId.contains($0.id) }
+protocol ChannelsViewDelegate: AnyObject {
+    func reloadView(_ favorites: [Channel], fromFavorites: Bool)
+}
 
+final class ChannelsView: UIView {
+    
+    weak var delegate: ChannelsViewDelegate?
+    private let storageService = StorageService.shared
+    var isFavorite: Bool
+    private var channels: [Channel]
+    
+    lazy var favoriteChanels = channels.filter { storageService.favoritesId.contains($0.id) } {
+        didSet {
+            if isFavorite { hideCollection() }
+        }
+    }
+    
     private lazy var emptyLabel: UILabel = {
         let label = UILabel()
         label.text = "Нет избранных каналов"
@@ -45,10 +40,18 @@ final class ChannelsView: UICollectionViewCell {
     
     override init(frame: CGRect) {
         self.channels = []
+        self.isFavorite = false
         super.init(frame: frame)
         backgroundColor = UIColor(red: 0.14, green: 0.14, blue: 0.15, alpha: 1)
         setupViews()
         setupConstarints()
+    }
+    
+    convenience init(channels: [Channel], isFavotire: Bool) {
+        self.init()
+        self.channels = channels
+        self.isFavorite = isFavotire
+        if isFavorite { hideCollection() }
     }
     
     required init?(coder: NSCoder) {
@@ -57,19 +60,12 @@ final class ChannelsView: UICollectionViewCell {
     
     @objc func addToFavorites(sender: Button) {
         let id = sender.tag
-        if storageService.favoritesId.contains(id)  {
-            sender.isSelected = false
-            storageService.delete(id)
-        } else {
-            sender.isSelected = true
-            storageService.add(id)
-        }
-        favoriteChanels = channels.filter { storageService.favoritesId.contains($0.id) }
-        if let indexPath = sender.indexPath, isFavorite { collectionView.deleteItems(at: [indexPath]) }
-    }
-    
-    func setupChanels(_ channels: [Channel]) {
-        self.channels = channels
+        let contains = storageService.favoritesId.contains(id)
+        sender.isSelected = !contains
+        contains ? storageService.delete(id) : storageService.add(id)
+        favoriteChanels = channels.filter({ storageService.favoritesId.contains($0.id) })
+        delegate?.reloadView(favoriteChanels, fromFavorites: isFavorite)
+        if isFavorite { collectionView.reloadData() }
     }
     
     private func setupViews() {
@@ -87,6 +83,11 @@ final class ChannelsView: UICollectionViewCell {
             NSLayoutConstraint.init(item: collectionView, attribute: .left, relatedBy: .equal, toItem: self, attribute: .left, multiplier: 1, constant: 0),
             NSLayoutConstraint.init(item: collectionView, attribute: .right, relatedBy: .equal, toItem: self, attribute: .right, multiplier: 1, constant: 0),
         ])
+    }
+    
+    private func hideCollection() {
+            collectionView.isHidden = StorageService.shared.favoritesId.isEmpty
+            emptyLabel.isHidden = !StorageService.shared.favoritesId.isEmpty
     }
 }
 

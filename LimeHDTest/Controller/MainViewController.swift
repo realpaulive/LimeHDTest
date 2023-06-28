@@ -2,9 +2,10 @@ import UIKit
 
 final class MainViewController: UIViewController {
     
-    private var channels: [Channel] = [] {
+    private var subViews: [ChannelsView]? {
         didSet {
-            collectionView.reloadData()
+            guard let subViews else { return }
+            setupScrollView(subViews: subViews)
         }
     }
     private var networkService = NetworkService()
@@ -34,16 +35,11 @@ final class MainViewController: UIViewController {
         return sb
     }()
     
-    private lazy var collectionView: UICollectionView = {
-        let layout = UICollectionViewFlowLayout()
-        layout.minimumLineSpacing = 0
-        layout.scrollDirection = .horizontal
-        let cv = UICollectionView(frame: .zero, collectionViewLayout: layout)
+    private lazy var scrollView: UIScrollView = {
+        let cv = UIScrollView()
         cv.showsHorizontalScrollIndicator = false
         cv.isPagingEnabled = true
         cv.translatesAutoresizingMaskIntoConstraints = false
-        cv.register(ChannelsView.self, forCellWithReuseIdentifier: ChannelsView.cellId)
-        cv.dataSource = self
         cv.delegate = self
         cv.bounces = false
         return cv
@@ -60,6 +56,10 @@ final class MainViewController: UIViewController {
         view.backgroundColor = .black
         navigationItem.titleView = seachBar
         fetchChannels()
+        
+        
+        //ask the system to start notifying when interface change
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -69,12 +69,11 @@ final class MainViewController: UIViewController {
     
     private func setupViews() {
         view.addSubview(statusBarBack)
-        view.addSubview(collectionView)
+        view.addSubview(scrollView)
         view.addSubview(menuBar)
     }
     
     private func setupConstraints() {
-        //        navigationController?.hidesBarsOnSwipe = true
         NSLayoutConstraint.activate([
             NSLayoutConstraint(item: menuBar, attribute: .top, relatedBy: .equal, toItem: view, attribute: .topMargin, multiplier: 1, constant: 0),
             NSLayoutConstraint(item: menuBar, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 60),
@@ -87,10 +86,10 @@ final class MainViewController: UIViewController {
             NSLayoutConstraint(item: statusBarBack, attribute: .left, relatedBy: .equal, toItem: view, attribute: .left, multiplier: 1, constant: 0),
             NSLayoutConstraint(item: statusBarBack, attribute: .right, relatedBy: .equal, toItem: view, attribute: .right, multiplier: 1, constant: 0),
             
-            NSLayoutConstraint(item: collectionView, attribute: .top, relatedBy: .equal, toItem: menuBar, attribute: .bottom, multiplier: 1, constant: 0),
-            NSLayoutConstraint(item: collectionView, attribute: .left, relatedBy: .equal, toItem: view, attribute: .left, multiplier: 1, constant: 0),
-            NSLayoutConstraint(item: collectionView, attribute: .right, relatedBy: .equal, toItem: view, attribute: .right, multiplier: 1, constant: 0),
-            NSLayoutConstraint(item: collectionView, attribute: .bottom, relatedBy: .equal, toItem: view, attribute: .bottom, multiplier: 1, constant: 0),
+            NSLayoutConstraint(item: scrollView, attribute: .top, relatedBy: .equal, toItem: menuBar, attribute: .bottom, multiplier: 1, constant: 0),
+            NSLayoutConstraint(item: scrollView, attribute: .left, relatedBy: .equal, toItem: view, attribute: .left, multiplier: 1, constant: 0),
+            NSLayoutConstraint(item: scrollView, attribute: .right, relatedBy: .equal, toItem: view, attribute: .right, multiplier: 1, constant: 0),
+            NSLayoutConstraint(item: scrollView, attribute: .bottom, relatedBy: .equal, toItem: view, attribute: .bottom, multiplier: 1, constant: 0),
         ])
     }
     
@@ -100,11 +99,24 @@ final class MainViewController: UIViewController {
             switch result {
             case .success(let channels):
                 DispatchQueue.main.async {
-                    self?.channels = channels
+                    self?.subViews = [ChannelsView(channels: channels, isFavotire: false),
+                                      ChannelsView(channels: channels, isFavotire: true)]
                 }
             case .failure(let error):
                 print(error.localizedDescription)
             }
+        }
+    }
+    
+    private func setupScrollView(subViews: [ChannelsView]) {
+        scrollView.contentSize = CGSize(width: scrollView.frame.width * CGFloat(subViews.count), height: scrollView.frame.height)
+        for i in 0..<subViews.count {
+            subViews[i].frame = CGRect(x: view.frame.width * CGFloat(i),
+                                       y: 0,
+                                       width: scrollView.frame.width,
+                                       height: scrollView.frame.height)
+            subViews[i].delegate = self
+            scrollView.addSubview(subViews[i])
         }
     }
 }
@@ -121,37 +133,32 @@ extension MainViewController {
     }
 }
 
-extension MainViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
-    
-    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-        
-    }
+extension MainViewController: UIScrollViewDelegate {
     
     func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
-        let row = Int(targetContentOffset.pointee.x / collectionView.frame.width)
+        let row = Int(targetContentOffset.pointee.x / scrollView.frame.width)
         let indexPath = IndexPath(row: row, section: 0)
         menuBar.collectionView.selectItem(at: indexPath, animated: true, scrollPosition: .init())
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        menuBar.titles.count
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ChannelsView.cellId, for: indexPath) as! ChannelsView
-        cell.setupChanels(self.channels)
-        if indexPath.row == 1 { cell.isFavorite = true }
-        return cell
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return collectionView.frame.size
+        if row == 1 {
+            subViews?[row].collectionView.reloadData()
+        }
     }
 }
 
 extension MainViewController: MenuBarDelegate {
     func scrollToIndexItem(_ index: Int) {
-        collectionView.setContentOffset(CGPoint(x: collectionView.frame.width * CGFloat(index), y: 0), animated: true)
-        collectionView.reloadData()
+        scrollView.setContentOffset(CGPoint(x: scrollView.frame.width * CGFloat(index), y: 0), animated: true)
+    }
+}
+
+extension MainViewController: ChannelsViewDelegate {
+    func reloadView(_ favorites: [Channel], fromFavorites: Bool) {
+        switch fromFavorites {
+        case true:
+            subViews?[0].collectionView.reloadData()
+        case false:
+            subViews?[1].favoriteChanels = favorites
+            subViews?[1].collectionView.reloadData()
+        }
     }
 }

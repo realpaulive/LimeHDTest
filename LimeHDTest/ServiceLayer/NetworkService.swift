@@ -7,7 +7,7 @@ final class NetworkService {
         let session = URLSession.shared
         var request = URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad)
         request.httpMethod = "GET"
-        let task = session.dataTask(with: request) { (data, _, error) in
+        session.dataTask(with: request) { (data, _, error) in
             if let error = error {
                 completion(.failure(error))
                 return
@@ -19,15 +19,14 @@ final class NetworkService {
             } catch let error {
                 completion(.failure(error))
             }
-        }
-        task.resume()
+        }.resume()
     }
     
     func fetchImage(url: URL, completion: @escaping (UIImage?) -> Void) {
         let session = URLSession.shared
         var request = URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad)
         request.httpMethod = "GET"
-        let task = session.dataTask(with: request) { (data, response, error) in
+        session.dataTask(with: request) { (data, response, error) in
             
             if let error = error {
                 print("Error: \(error.localizedDescription)")
@@ -47,7 +46,6 @@ final class NetworkService {
             } else {
                 completion(nil)
             }
-        }
-        task.resume()
+        }.resume()
     }
 }
