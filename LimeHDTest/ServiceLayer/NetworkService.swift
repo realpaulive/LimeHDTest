@@ -1,0 +1,53 @@
+import UIKit
+import Foundation
+
+final class NetworkService {
+    
+    func fetchChannels(url: URL, completion: @escaping (Result<[Channel], Error>) -> Void) {
+        let session = URLSession.shared
+        var request = URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad)
+        request.httpMethod = "GET"
+        let task = session.dataTask(with: request) { (data, _, error) in
+            if let error = error {
+                completion(.failure(error))
+                return
+            }
+            do {
+                guard let data else { return }
+                let decodeData = try JSONDecoder().decode(LimeResponse.self, from: data)
+                completion(.success(decodeData.channels))
+            } catch let error {
+                completion(.failure(error))
+            }
+        }
+        task.resume()
+    }
+    
+    func fetchImage(url: URL, completion: @escaping (UIImage?) -> Void) {
+        let session = URLSession.shared
+        var request = URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad)
+        request.httpMethod = "GET"
+        let task = session.dataTask(with: request) { (data, response, error) in
+            
+            if let error = error {
+                print("Error: \(error.localizedDescription)")
+                completion(nil)
+                return
+            }
+            
+            guard response is HTTPURLResponse else {
+                print("Invalid HTTP response")
+                completion(nil)
+                return
+            }
+            
+            if let data = data, let image = UIImage(data: data) {
+                completion(image)
+                
+            } else {
+                completion(nil)
+            }
+        }
+        task.resume()
+    }
+}
