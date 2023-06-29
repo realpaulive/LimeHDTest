@@ -4,7 +4,7 @@ final class ChannelCell: UICollectionViewCell {
     
     static let cellId = "ChannelCell"
     
-    let networkService = NetworkService()
+    var networkService: NetworkService?
     
     var id: Int?
     
@@ -78,8 +78,7 @@ final class ChannelCell: UICollectionViewCell {
         channelTitle.text = channel.nameRu
         broadcastTitle.text = channel.current.title
         
-        guard let url = URL(string: channel.image) else { return }
-        
+        guard let url = URL(string: channel.image), let networkService else { return }
         networkService.fetchImage(url: url) { image in
             DispatchQueue.main.async {
                 guard let image else { return }

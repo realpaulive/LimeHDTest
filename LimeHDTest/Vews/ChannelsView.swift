@@ -9,6 +9,7 @@ final class ChannelsView: UIView {
     
     weak var delegate: ChannelsViewDelegate?
     private let storageService = StorageService.shared
+    private let networkService = NetworkService()
     var isFavorite: Bool
     private var channels: [Channel]
     
@@ -111,6 +112,7 @@ extension ChannelsView: UICollectionViewDelegate, UICollectionViewDataSource, UI
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ChannelCell.cellId, for: indexPath) as! ChannelCell
+        cell.networkService = networkService
         isFavorite ? cell.setupCell(whithChannel: favoriteChanels[indexPath.row]) : cell.setupCell(whithChannel: channels[indexPath.row])
         guard let id = cell.id else { return cell }
         cell.starButton.isSelected = storageService.favoritesId.contains(id)
